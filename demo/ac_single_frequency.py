@@ -3,7 +3,7 @@ import spicepy.netlist as ntl
 from spicepy.netsolve import net_solve
 
 # read netlist
-net = ntl.Network('ac_single_frequency.net')
+net = ntl.Network("ac_single_frequency.net")
 
 # compute the circuit solution
 net_solve(net)

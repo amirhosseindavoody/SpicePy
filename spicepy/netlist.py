@@ -76,59 +76,95 @@ class Network:
         num2node_label = {num: name for name, num in self.node_label2num.items()}
 
         # build message to print
-        msg = '------------------------\n'
-        msg += '    SpicePy.Network:\n'
-        msg += '------------------------\n'
+        msg = "------------------------\n"
+        msg += "    SpicePy.Network:\n"
+        msg += "------------------------\n"
         for ele, nodes, val in zip(self.names, self.nodes, self.values):
             # if val is a list --> ele is a transient source
             if isinstance(val, list):
-                if self.source_type[ele] == 'pwl':
+                if self.source_type[ele] == "pwl":
                     fmt = "{} {} {} {}(" + "{} " * (len(val[0]) - 1) + "{})\n"
-                    msg += fmt.format(ele, num2node_label[nodes[0]], num2node_label[nodes[1]], self.source_type[ele], *val[0])
+                    msg += fmt.format(
+                        ele,
+                        num2node_label[nodes[0]],
+                        num2node_label[nodes[1]],
+                        self.source_type[ele],
+                        *val[0],
+                    )
                 else:
                     fmt = "{} {} {} {}(" + "{} " * (len(val) - 1) + "{})\n"
-                    msg += fmt.format(ele, num2node_label[nodes[0]], num2node_label[nodes[1]], self.source_type[ele], *val)
+                    msg += fmt.format(
+                        ele,
+                        num2node_label[nodes[0]],
+                        num2node_label[nodes[1]],
+                        self.source_type[ele],
+                        *val,
+                    )
             # controlled sources
-            elif (ele[0].upper() == 'E') | (ele[0].upper() == 'G'):
-                msg += "{} {} {} {} {} {}\n".format(ele, num2node_label[nodes[0]], num2node_label[nodes[1]],
-                                                    self.control_source[ele][0],
-                                                    self.control_source[ele][1],
-                                                    val)
-            elif (ele[0].upper() == 'F') | (ele[0].upper() == 'H'):
-                msg += "{} {} {} {} {}\n".format(ele, num2node_label[nodes[0]], num2node_label[nodes[1]],
-                                                 self.control_source[ele],
-                                                 val)
+            elif (ele[0].upper() == "E") | (ele[0].upper() == "G"):
+                msg += "{} {} {} {} {} {}\n".format(
+                    ele,
+                    num2node_label[nodes[0]],
+                    num2node_label[nodes[1]],
+                    self.control_source[ele][0],
+                    self.control_source[ele][1],
+                    val,
+                )
+            elif (ele[0].upper() == "F") | (ele[0].upper() == "H"):
+                msg += "{} {} {} {} {}\n".format(
+                    ele,
+                    num2node_label[nodes[0]],
+                    num2node_label[nodes[1]],
+                    self.control_source[ele],
+                    val,
+                )
             # if val is complex --> ele is a phasor
             elif np.iscomplex(val):
-                msg += "{} {} {} {} {}\n".format(ele, num2node_label[nodes[0]], num2node_label[nodes[1]], np.abs(val), np.angle(val) * 180/np.pi)
+                msg += "{} {} {} {} {}\n".format(
+                    ele,
+                    num2node_label[nodes[0]],
+                    num2node_label[nodes[1]],
+                    np.abs(val),
+                    np.angle(val) * 180 / np.pi,
+                )
             # if ele is C or L
-            elif ele[0].upper() == 'C' or ele[0].upper() == 'L':
+            elif ele[0].upper() == "C" or ele[0].upper() == "L":
                 # check if an i.c. is present and print it
                 if ele in self.IC:
-                    msg += "{} {} {} {} ic={}\n".format(ele, num2node_label[nodes[0]], num2node_label[nodes[1]], val, self.IC[ele])
+                    msg += "{} {} {} {} ic={}\n".format(
+                        ele,
+                        num2node_label[nodes[0]],
+                        num2node_label[nodes[1]],
+                        val,
+                        self.IC[ele],
+                    )
                 # otherwise...
                 else:
-                    msg += "{} {} {} {}\n".format(ele, num2node_label[nodes[0]], num2node_label[nodes[1]], val)
+                    msg += "{} {} {} {}\n".format(
+                        ele, num2node_label[nodes[0]], num2node_label[nodes[1]], val
+                    )
             # otherwise...general case -->  ele n+ n- val
             else:
-                msg += "{} {} {} {}\n".format(ele, num2node_label[nodes[0]], num2node_label[nodes[1]], val)
+                msg += "{} {} {} {}\n".format(
+                    ele, num2node_label[nodes[0]], num2node_label[nodes[1]], val
+                )
 
         # add analysis
-        msg += " ".join(self.analysis) + '\n'
+        msg += " ".join(self.analysis) + "\n"
 
         # if a plot command is present, add it
         if self.plot_cmd is not None:
-            msg += self.plot_cmd + '\n'
+            msg += self.plot_cmd + "\n"
 
         # if a transfer function definition is present, add it
         if self.tf_cmd is not None:
-            msg += self.tf_cmd + '\n'
+            msg += self.tf_cmd + "\n"
 
         # add number of nodes (reference node is included) and number of branches
-        msg += '------------------------\n'
-        msg += '* number of nodes {}\n'.format(self.node_num + 1)
-        msg += '* number of branches {}\n'.format(len(self.names))
-        msg += '------------------------\n'
+        msg += "------------------------\n"
+        msg += "* number of nodes {}\n".format(self.node_num + 1)
+        msg += "* number of branches {}\n".format(len(self.names))
+        msg += "------------------------\n"
 
         return msg
 
@@ -151,20 +187,32 @@ class Network:
         self.vb = None
         self.ib = None
         self.pb = None
-        self.unit_prefix = {'meg': 'e6', 'f': 'e-15', 'p': 'e-12', 'n': 'e-9', 'u': 'e-6', 'm': 'e-3', 'k': 'e3', 'g': 'e9', 't': 'e12'}
+        self.unit_prefix = {
+            "meg": "e6",
+            "f": "e-15",
+            "p": "e-12",
+            "n": "e-9",
+            "u": "e-6",
+            "m": "e-3",
+            "k": "e3",
+            "g": "e9",
+            "t": "e12",
+        }
 
         # common attributes
-        (self.names,
-         self.values,
-         self.IC,
-         self.source_type,
-         self.control_source,
-         self.nodes,
-         self.node_label2num,
-         self.node_num,
-         self.analysis,
-         self.plot_cmd,
-         self.tf_cmd) = self.read_netlist(filename)
+        (
+            self.names,
+            self.values,
+            self.IC,
+            self.source_type,
+            self.control_source,
+            self.nodes,
+            self.node_label2num,
+            self.node_num,
+            self.analysis,
+            self.plot_cmd,
+            self.tf_cmd,
+        ) = self.read_netlist(filename)
 
     def read_netlist(self, filename):
         """
@@ -198,7 +246,7 @@ class Network:
         analysis = None
 
         # initial letter of all available components
-        initials = ['V', 'I', 'R', 'C', 'L', 'E', 'F', 'G', 'H']
+        initials = ["V", "I", "R", "C", "L", "E", "F", "G", "H"]
         components = []
 
         # 1) get the analysis type
@@ -207,40 +255,44 @@ class Network:
         with open(filename) as f:
             # cycle on lines
             for b, line in enumerate(f):
-
                 # look for inline comments
-                if ';' in line:
+                if ";" in line:
                     # remove comment
-                    line = line[:line.index(';')]
+                    line = line[: line.index(";")]
 
                 # if it is not a line-comment
-                if line[0] != '*':
-
+                if line[0] != "*":
                     # check if line describes a component
                     if line[0].upper() in initials:
                         # remove carriage return
-                        line = line.replace('\n', '')
+                        line = line.replace("\n", "")
                         # add to component list
                         components.append(line)
 
                     # check if line describes a command
-                    elif line[0] == '.':
+                    elif line[0] == ".":
                         # remove carriage return
-                        line = line.replace('\n', '')
+                        line = line.replace("\n", "")
 
-                        if line.lower().find('.end') != -1:    # if .end is reached exit
+                        if line.lower().find(".end") != -1:  # if .end is reached exit
                             break
 
-                        elif line.lower().find('.plot') != -1:    # if .plot is reached save it
+                        elif (
+                            line.lower().find(".plot") != -1
+                        ):  # if .plot is reached save it
                             plot_cmd = line
 
-                        elif line.lower().find('.tf') != -1:    # if .tf is reached save it
+                        elif (
+                            line.lower().find(".tf") != -1
+                        ):  # if .tf is reached save it
                             tf_cmd = line
 
-                        elif line.lower().find('.backanno') != -1:    # skip .backanno if present
+                        elif (
+                            line.lower().find(".backanno") != -1
+                        ):  # skip .backanno if present
                             pass
 
-                        else:    # save analysis type
+                        else:  # save analysis type
                             # split into a list
                             analysis = line.split()
 
@@ -249,11 +301,10 @@ class Network:
 
         # cycle on component list
         for line in components:
-
             # look for transient sources (if analysis is .tran)
-            if analysis[0] == '.tran':
+            if analysis[0] == ".tran":
                 # loop on all possible transient sources
-                time_sources = ['pwl', 'pulse', 'sin', 'exp']
+                time_sources = ["pwl", "pulse", "sin", "exp"]
                 for source in time_sources:
                     # when one is found
                     if source in line.lower():
@@ -262,7 +313,7 @@ class Network:
                         # split string before its name
                         sline = line[:index].split()
                         # 1) remove '(' and ')' in the string after its name 2) and split
-                        param = line[index:].replace('(',' ').replace(')',' ').split()
+                        param = line[index:].replace("(", " ").replace(")", " ").split()
                         # append transient-source name
                         sline.append(param[0])
                         # append parameters
@@ -279,73 +330,96 @@ class Network:
                 sline = line.split()
 
             # detect element type
-            if sline[0][0].upper() == 'R':  # resistance
+            if sline[0][0].upper() == "R":  # resistance
                 # add name and value
                 names.append(sline[0])
                 values.append(float(self.convert_unit(sline[3])))
                 node_labels.append(sline[1:3])
 
             # inductor
-            elif sline[0][0].upper() == 'L':
+            elif sline[0][0].upper() == "L":
                 # add name, value and nodes
                 names.append(sline[0])
                 values.append(float(self.convert_unit(sline[3])))
                 node_labels.append(sline[1:3])
 
                 # for '.tran'
-                if analysis[0] == '.tran':
+                if analysis[0] == ".tran":
                     # check presence of i.c.
                     if len(sline) == 5:
-                        if sline[4].lower().find('ic') != -1:
-                            IC[sline[0]] = float(self.convert_unit(sline[4].split('=')[1]))
+                        if sline[4].lower().find("ic") != -1:
+                            IC[sline[0]] = float(
+                                self.convert_unit(sline[4].split("=")[1])
+                            )
                         else:
-                            #IC[sline[0]] = 'Please check this --> ' + sline[-1]
+                            # IC[sline[0]] = 'Please check this --> ' + sline[-1]
                             # print("Warning: wrong definition of IC for {} --> ".format(sline[0]) + IC[sline[0]])
-                            raise ValueError("Warning: wrong definition of IC for {} --> ".format(sline[0]) + IC[sline[0]])
+                            raise ValueError(
+                                "Warning: wrong definition of IC for {} --> ".format(
+                                    sline[0]
+                                )
+                                + IC[sline[0]]
+                            )
 
                     # add ic=0 if i.c. non provided by the user
                     else:
                         IC[sline[0]] = 0
 
             # capacitor
-            elif sline[0][0].upper() == 'C':
+            elif sline[0][0].upper() == "C":
                 # add name and value
                 names.append(sline[0])
                 values.append(float(self.convert_unit(sline[3])))
                 node_labels.append(sline[1:3])
 
-                if analysis[0] == '.tran':
+                if analysis[0] == ".tran":
                     if len(sline) == 5:
-                        if sline[4].lower().find('ic') != -1:
-                            IC[sline[0]] = float(self.convert_unit(sline[4].split('=')[1]))
+                        if sline[4].lower().find("ic") != -1:
+                            IC[sline[0]] = float(
+                                self.convert_unit(sline[4].split("=")[1])
+                            )
                         else:
-                            #IC[sline[0]] = 'Please check this --> ' + sline[-1]
-                            #print("Warning: wrong definition of IC for {} --> ".format(sline[0]) + IC[sline[0]])
-                            raise ValueError("Warning: wrong definition of IC for {} --> ".format(sline[0]) + IC[sline[0]])
+                            # IC[sline[0]] = 'Please check this --> ' + sline[-1]
+                            # print("Warning: wrong definition of IC for {} --> ".format(sline[0]) + IC[sline[0]])
+                            raise ValueError(
+                                "Warning: wrong definition of IC for {} --> ".format(
+                                    sline[0]
+                                )
+                                + IC[sline[0]]
+                            )
 
                     # add ic=0 if i.c. non provided by the user
                     else:
                         IC[sline[0]] = 0
 
             # independent current source
-            elif sline[0][0].upper() == 'I':
+            elif sline[0][0].upper() == "I":
                 # add name and nodes
                 names.append(sline[0])
                 node_labels.append(sline[1:3])
 
                 # if '.ac' and phase is present:
-                if (analysis[0] == '.ac') & (len(sline) == 5):
-                    values.append(float(self.convert_unit(sline[3])) * (
-                    np.cos(float(sline[4]) * pi / 180) + np.sin(float(sline[4]) * pi / 180) * 1j))
+                if (analysis[0] == ".ac") & (len(sline) == 5):
+                    values.append(
+                        float(self.convert_unit(sline[3]))
+                        * (
+                            np.cos(float(sline[4]) * pi / 180)
+                            + np.sin(float(sline[4]) * pi / 180) * 1j
+                        )
+                    )
                 # if '.tran' ...
-                elif analysis[0] == '.tran':
+                elif analysis[0] == ".tran":
                     # if is a transient source
                     if isinstance(sline[-1], list):
                         source_type[sline[0]] = sline[-2]
-                        if source_type[sline[0]] == 'pwl':
-                            values.append([[float(self.convert_unit(k)) for k in sline[-1]]])
+                        if source_type[sline[0]] == "pwl":
+                            values.append(
+                                [[float(self.convert_unit(k)) for k in sline[-1]]]
+                            )
                         else:
-                            values.append([float(self.convert_unit(k)) for k in sline[-1]])
+                            values.append(
+                                [float(self.convert_unit(k)) for k in sline[-1]]
+                            )
                     # otherwise...
                     else:
                         values.append(float(self.convert_unit(sline[3])))
@@ -354,24 +428,33 @@ class Network:
                     values.append(float(self.convert_unit(sline[3])))
 
             # independent voltage sources
-            elif sline[0][0].upper() == 'V':
+            elif sline[0][0].upper() == "V":
                 # add name and nodes
                 names.append(sline[0])
                 node_labels.append(sline[1:3])
 
                 # if '.ac' and phase is present:
-                if (analysis[0] == '.ac') & (len(sline) == 5):
-                    values.append(float(self.convert_unit(sline[3])) * (
-                    np.cos(float(sline[4]) * pi / 180) + np.sin(float(sline[4]) * pi / 180) * 1j))
+                if (analysis[0] == ".ac") & (len(sline) == 5):
+                    values.append(
+                        float(self.convert_unit(sline[3]))
+                        * (
+                            np.cos(float(sline[4]) * pi / 180)
+                            + np.sin(float(sline[4]) * pi / 180) * 1j
+                        )
+                    )
                 # if '.tran'
-                elif analysis[0] == '.tran':
+                elif analysis[0] == ".tran":
                     # if is a transient source
                     if isinstance(sline[-1], list):
                         source_type[sline[0]] = sline[-2]
-                        if source_type[sline[0]] == 'pwl':
-                            values.append([[float(self.convert_unit(k)) for k in sline[-1]]])
+                        if source_type[sline[0]] == "pwl":
+                            values.append(
+                                [[float(self.convert_unit(k)) for k in sline[-1]]]
+                            )
                         else:
-                            values.append([float(self.convert_unit(k)) for k in sline[-1]])
+                            values.append(
+                                [float(self.convert_unit(k)) for k in sline[-1]]
+                            )
                     # otherwise...
                     else:
                         values.append(float(self.convert_unit(sline[3])))
@@ -380,7 +463,7 @@ class Network:
                     values.append(float(self.convert_unit(sline[3])))
 
             # VCVS or VCCS
-            elif (sline[0][0].upper() == 'E') | (sline[0][0].upper() == 'G'):
+            elif (sline[0][0].upper() == "E") | (sline[0][0].upper() == "G"):
                 # add name and nodes
                 names.append(sline[0])
                 node_labels.append(sline[1:3])
@@ -390,7 +473,7 @@ class Network:
                 values.append(float(self.convert_unit(sline[5])))
 
             # CCCS or CCVS
-            elif (sline[0][0].upper() == 'F') | (sline[0][0].upper() == 'H'):
+            elif (sline[0][0].upper() == "F") | (sline[0][0].upper() == "H"):
                 # add name and nodes
                 names.append(sline[0])
                 node_labels.append(sline[1:3])
@@ -401,19 +484,31 @@ class Network:
 
         # reordering nodes
         unique_names, ii = np.unique(node_labels, return_inverse=True)
-        if '0' not in unique_names:
+        if "0" not in unique_names:
             raise ValueError("Error: the network does not include node '0'")
 
-        nodes = np.reshape(ii, (len(node_labels),2))
+        nodes = np.reshape(ii, (len(node_labels), 2))
         # link name-2-number
         node_labels2num = {}
-        for k , label in enumerate(np.unique(node_labels)):
+        for k, label in enumerate(np.unique(node_labels)):
             node_labels2num[label] = k
 
         Nn = nodes.max()
 
         # return network structure
-        return names, values, IC, source_type, control_source, nodes, node_labels2num, Nn, analysis, plot_cmd, tf_cmd
+        return (
+            names,
+            values,
+            IC,
+            source_type,
+            control_source,
+            nodes,
+            node_labels2num,
+            Nn,
+            analysis,
+            plot_cmd,
+            tf_cmd,
+        )
 
     def convert_unit(self, string_value):
         """
@@ -496,13 +591,13 @@ class Network:
             N1, N2 = self.nodes[ir]
 
             # detect connection
-            if (N1 == 0) or (N2 == 0): # if grounded...
+            if (N1 == 0) or (N2 == 0):  # if grounded...
                 # diagonal term
                 g.append(1.0 / self.values[ir])
                 g_row.append(max([N1, N2]) - 1)
                 g_col.append(max([N1, N2]) - 1)
 
-            else:                      # if not grounded...
+            else:  # if not grounded...
                 # diagonal term
                 g.append(1.0 / self.values[ir])
                 g_row.append(N1 - 1)
@@ -578,7 +673,7 @@ class Network:
             N1, N2 = self.nodes[iv]
 
             # detect connection
-            if N1 == 0:               # if grounded to N1 ...
+            if N1 == 0:  # if grounded to N1 ...
                 # negative terminal
                 g.append(-1)
                 g_row.append(N2 - 1)
@@ -589,7 +684,7 @@ class Network:
                 g_row.append(self.node_num + len(indexL) + k)
                 g_col.append(N2 - 1)
 
-            elif N2 == 0:              # if grounded to N2 ...
+            elif N2 == 0:  # if grounded to N2 ...
                 # positive terminal
                 g.append(1)
                 g_row.append(N1 - 1)
@@ -600,7 +695,7 @@ class Network:
                 g_row.append(self.node_num + len(indexL) + k)
                 g_col.append(N1 - 1)
 
-            else:                      # if not grounded ...
+            else:  # if not grounded ...
                 # positive terminal
                 g.append(1)
                 g_row.append(N1 - 1)
@@ -620,7 +715,6 @@ class Network:
                 g.append(-1)
                 g_row.append(self.node_num + len(indexL) + k)
                 g_col.append(N2 - 1)
-
 
         # cycle on VCVS
         for k, ie in enumerate(indexE):
@@ -672,7 +766,9 @@ class Network:
                 g_col.append(N2 - 1)
 
             # get control nodes
-            N1, N2 = [self.node_label2num[k] for k in self.control_source[self.names[ie]]]
+            N1, N2 = [
+                self.node_label2num[k] for k in self.control_source[self.names[ie]]
+            ]
 
             # detect connection
             if N1 == 0:  # if grounded to N1 ...
@@ -705,25 +801,31 @@ class Network:
             # get Vsens
             Vsens = self.control_source[self.names[indF]]
             # get index of Vsens
-            if Vsens[0].upper() == 'V':
+            if Vsens[0].upper() == "V":
                 h = sorted(self.isort[3]).index(self.names.index(Vsens))
                 n = self.node_num + len(self.isort[1]) + h
-            elif Vsens[0].upper() == 'E':
+            elif Vsens[0].upper() == "E":
                 h = sorted(self.isort[5]).index(self.names.index(Vsens))
                 n = self.node_num + len(self.isort[1]) + len(self.isort[3]) + h
-            elif Vsens[0].upper() == 'H':
+            elif Vsens[0].upper() == "H":
                 h = sorted(self.isort[8]).index(self.names.index(Vsens))
-                n = self.node_num + len(self.isort[1]) + len(self.isort[3]) + len(self.isort[5]) + h
+                n = (
+                    self.node_num
+                    + len(self.isort[1])
+                    + len(self.isort[3])
+                    + len(self.isort[5])
+                    + h
+                )
 
-            if N1 == 0: # if grounded to N1 ...
+            if N1 == 0:  # if grounded to N1 ...
                 g.append(-self.values[indF])
                 g_row.append(N2 - 1)
                 g_col.append(n)
-            elif N2 == 0: # if grounded to N2 ...
+            elif N2 == 0:  # if grounded to N2 ...
                 g.append(self.values[indF])
                 g_row.append(N1 - 1)
                 g_col.append(n)
-            else: # if not grounded ...
+            else:  # if not grounded ...
                 g.append(self.values[indF])
                 g_row.append(N1 - 1)
                 g_col.append(n)
@@ -737,7 +839,9 @@ class Network:
             # get nodes
             N1, N2 = self.nodes[iG]
             # get control nodes
-            Nc1, Nc2 = [self.node_label2num[k] for k in self.control_source[self.names[iG]]]
+            Nc1, Nc2 = [
+                self.node_label2num[k] for k in self.control_source[self.names[iG]]
+            ]
 
             if (N1 != 0) & (Nc1 != 0):
                 g.append(self.values[iG])
@@ -763,39 +867,75 @@ class Network:
             # get Vsens
             Vsens = self.control_source[self.names[iH]]
             # get index of Vsens
-            if Vsens[0].upper() == 'V':
+            if Vsens[0].upper() == "V":
                 h = sorted(self.isort[3]).index(self.names.index(Vsens))
                 n = self.node_num + len(self.isort[1]) + h
-            elif Vsens[0].upper() == 'E':
+            elif Vsens[0].upper() == "E":
                 h = sorted(self.isort[5]).index(self.names.index(Vsens))
                 n = self.node_num + len(self.isort[1]) + len(self.isort[3]) + h
-            elif Vsens[0].upper() == 'H':
+            elif Vsens[0].upper() == "H":
                 h = sorted(self.isort[8]).index(self.names.index(Vsens))
-                n = self.node_num + len(self.isort[1]) + len(self.isort[3]) + len(self.isort[5]) + h
+                n = (
+                    self.node_num
+                    + len(self.isort[1])
+                    + len(self.isort[3])
+                    + len(self.isort[5])
+                    + h
+                )
 
             if N1 != 0:
                 g.append(1)
                 g_row.append(N1 - 1)
-                g_col.append(self.node_num + len(self.isort[1]) + len(self.isort[3]) + len(self.isort[5]) + k)
+                g_col.append(
+                    self.node_num
+                    + len(self.isort[1])
+                    + len(self.isort[3])
+                    + len(self.isort[5])
+                    + k
+                )
                 #
                 g.append(1)
-                g_row.append(self.node_num + len(self.isort[1]) + len(self.isort[3]) + len(self.isort[5]) + k)
+                g_row.append(
+                    self.node_num
+                    + len(self.isort[1])
+                    + len(self.isort[3])
+                    + len(self.isort[5])
+                    + k
+                )
                 g_col.append(N1 - 1)
             if N2 != 0:
                 g.append(-1)
                 g_row.append(N2 - 1)
-                g_col.append(self.node_num + len(self.isort[1]) + len(self.isort[3]) + len(self.isort[5]) + k)
+                g_col.append(
+                    self.node_num
+                    + len(self.isort[1])
+                    + len(self.isort[3])
+                    + len(self.isort[5])
+                    + k
+                )
                 #
                 g.append(-1)
-                g_row.append(self.node_num + len(self.isort[1]) + len(self.isort[3]) + len(self.isort[5]) + k)
+                g_row.append(
+                    self.node_num
+                    + len(self.isort[1])
+                    + len(self.isort[3])
+                    + len(self.isort[5])
+                    + k
+                )
                 g_col.append(N2 - 1)
 
             g.append(-self.values[iH])
-            g_row.append(self.node_num + len(self.isort[1]) + len(self.isort[3]) + len(self.isort[5]) + k)
+            g_row.append(
+                self.node_num
+                + len(self.isort[1])
+                + len(self.isort[3])
+                + len(self.isort[5])
+                + k
+            )
             g_col.append(n)
 
         # create conductance matrix
-        self.G = csr_matrix((g,(g_row,g_col)))
+        self.G = csr_matrix((g, (g_row, g_col)))
 
     def dynamic_matrix(self):
         """
@@ -869,10 +1009,17 @@ class Network:
         if self.isort is None:
             self.reorder()
 
-        if self.analysis[0] == '.tran':
+        if self.analysis[0] == ".tran":
+
             def fun(t):
                 # initialize rhs
-                rhs = [0] * (self.node_num + len(self.isort[1]) + len(self.isort[3]) + len(self.isort[5]) + len(self.isort[8]))
+                rhs = [0] * (
+                    self.node_num
+                    + len(self.isort[1])
+                    + len(self.isort[3])
+                    + len(self.isort[5])
+                    + len(self.isort[8])
+                )
 
                 # get index
                 NL = len(self.isort[1])
@@ -927,9 +1074,14 @@ class Network:
             return fun
 
         else:
-
             # initialize rhs
-            rhs = [0] * (self.node_num + len(self.isort[1]) + len(self.isort[3]) + len(self.isort[5]) + len(self.isort[8]))
+            rhs = [0] * (
+                self.node_num
+                + len(self.isort[1])
+                + len(self.isort[3])
+                + len(self.isort[5])
+                + len(self.isort[8])
+            )
 
             # get index
             NL = len(self.isort[1])
@@ -978,7 +1130,7 @@ class Network:
             return None
 
         # branch voltages
-        self.vb = self.A.transpose() * self.x[:self.node_num, ...]
+        self.vb = self.A.transpose() * self.x[: self.node_num, ...]
 
     def branch_current(self):
         """
@@ -1013,7 +1165,7 @@ class Network:
         if self.ib is None:
             self.branch_current()
 
-        if self.analysis[0].lower() == '.ac':
+        if self.analysis[0].lower() == ".ac":
             self.pb = self.vb * np.conj(self.ib)
         else:
             self.pb = self.vb * self.ib
@@ -1025,22 +1177,22 @@ class Network:
         :return:
             * self.f: frequency array
         """
-        if self.analysis[0].lower() != '.ac':
+        if self.analysis[0].lower() != ".ac":
             raise ValueError("frequency_span works only for .ac analyses")
 
-        if self.analysis[1].lower() == 'lin':
+        if self.analysis[1].lower() == "lin":
             npt = int(self.analysis[2])
             fs = float(self.convert_unit(self.analysis[3]))
             fe = float(self.convert_unit(self.analysis[4]))
             self.f = np.linspace(fs, fe, npt)
 
-        elif self.analysis[1].lower() == 'dec':
+        elif self.analysis[1].lower() == "dec":
             npt_d = float(self.analysis[2])
             fs = np.log10(float(self.convert_unit(self.analysis[3])))
             fe = np.log10(float(self.convert_unit(self.analysis[4])))
             self.f = np.logspace(fs, fe, int(np.ceil(npt_d * (fe - fs)).item()))
 
-        elif self.analysis[1].lower() == 'oct':
+        elif self.analysis[1].lower() == "oct":
             npt_d = float(self.analysis[2])
             fs = np.log2(float(self.convert_unit(self.analysis[3])))
             fe = np.log2(float(self.convert_unit(self.analysis[4])))
@@ -1059,62 +1211,60 @@ class Network:
         :return: voltages (numpy.array)
         """
 
-        if isinstance(arg, str):    # in the input is a string
+        if isinstance(arg, str):  # in the input is a string
             # make all uppercase and split
             arg = arg
             voltage_list = arg.split()
 
             # initialize output
-            if self.analysis[0].lower() == '.tran':
+            if self.analysis[0].lower() == ".tran":
                 v = np.zeros((len(voltage_list), self.t.size), dtype=self.x.dtype)
-            elif (self.analysis[0].lower() == '.ac') & (not np.isscalar(self.f)):
+            elif (self.analysis[0].lower() == ".ac") & (not np.isscalar(self.f)):
                 v = np.zeros((len(voltage_list), self.f.size), dtype=self.x.dtype)
             else:
                 v = np.zeros(len(voltage_list), dtype=self.x.dtype)
 
             # cycle on voltages
             for k, variable in enumerate(voltage_list):
-
                 # remove unused symbols
-                remove_char = ('(', ')')
+                remove_char = ("(", ")")
                 for char in remove_char:
-                    variable = variable.replace(char, '')
+                    variable = variable.replace(char, "")
 
                 # check variable/node-pair
                 if variable in self.names:
                     id = self.names.index(variable)
                     nodes = [n - 1 for n in self.nodes[id] if n != 0]
                     if len(nodes) == 2:
-                        v[k,...] = self.x[nodes[0], ...] - self.x[nodes[1], ...]
+                        v[k, ...] = self.x[nodes[0], ...] - self.x[nodes[1], ...]
                     else:
                         if self.nodes[id][0] != 0:
                             sign = 1
                         else:
                             sign = -1
-                        
-                        v[k,...] = self.x[nodes[0], ...] * sign
+
+                        v[k, ...] = self.x[nodes[0], ...] * sign
                 else:
-                    node_labels = variable.split(',')
+                    node_labels = variable.split(",")
                     node_number = [self.node_label2num[k] for k in node_labels]
                     nodes = [int(k) - 1 for k in node_number if k != 0]
                     if len(nodes) == 2:
-                        v[k,...] = self.x[nodes[0], ...] - self.x[nodes[1], ...]
+                        v[k, ...] = self.x[nodes[0], ...] - self.x[nodes[1], ...]
                     else:
                         if node_number[0] != 0:
                             sign = 1
                         else:
                             sign = -1
 
-                        v[k,...] = self.x[nodes[0], ...] * sign
+                        v[k, ...] = self.x[nodes[0], ...] * sign
 
         else:  # if the input is a node-pair list
-
             # check is a single node-pair is given
             if not isinstance(arg[0], list):
                 arg = [arg]
 
             # initialize output
-            if self.analysis[0].lower() == '.tran':
+            if self.analysis[0].lower() == ".tran":
                 v = np.zeros((len(arg), self.t.size), dtype=self.x.dtype)
             else:
                 v = np.zeros(len(arg), dtype=self.x.dtype)
@@ -1131,7 +1281,7 @@ class Network:
                         sign = 1
                     else:
                         sign = -1
-                    
+
                     v[k, ...] = self.x[nodes[0], ...] * sign
 
         # remove one dimension for single voltage in .tran
@@ -1150,7 +1300,7 @@ class Network:
         :return: currents (numpy.array)
         """
 
-        if isinstance(arg, str):    # in the input is a string
+        if isinstance(arg, str):  # in the input is a string
             # make all uppercase and split
             arg = arg.upper()
             current_list = arg.split()
@@ -1160,49 +1310,48 @@ class Network:
                 current_list.append(self.names[index])
 
         # initialize output
-        if self.analysis[0].lower() == '.tran':
+        if self.analysis[0].lower() == ".tran":
             i = np.zeros((len(current_list), self.t.size), dtype=self.x.dtype)
-        elif (self.analysis[0].lower() == '.ac') & (not np.isscalar(self.f)):
+        elif (self.analysis[0].lower() == ".ac") & (not np.isscalar(self.f)):
             i = np.zeros((len(current_list), self.f.size), dtype=self.x.dtype)
         else:
             i = np.zeros(len(current_list), dtype=self.x.dtype)
 
         # cycle on voltages
         for k, variable in enumerate(current_list):
-
             # remove unused symbols
-            remove_char = ('(', ')')
+            remove_char = ("(", ")")
             for char in remove_char:
-                variable = variable.replace(char, '')
+                variable = variable.replace(char, "")
 
             if variable not in self.names:
                 variable = self.names[int(variable)]
 
             # resistor or capacitor
-            if (variable[0] == 'R') or (variable[0] == 'C'):
-
+            if (variable[0] == "R") or (variable[0] == "C"):
                 # get voltage and index
                 v = self.get_voltage(variable)
                 id = self.names.index(variable)
                 # resistor
-                if variable[0] == 'R':
+                if variable[0] == "R":
                     i[k, ...] = v / self.values[id]
                 # capacitor
-                elif variable[0] == 'C':
+                elif variable[0] == "C":
                     # time derivative for .tran
-                    if self.analysis[0].lower() == '.tran':
+                    if self.analysis[0].lower() == ".tran":
                         from scipy.interpolate import CubicSpline
+
                         cs = CubicSpline(self.t, v)
                         csd = cs.derivative()
                         i[k, ...] = self.values[id] * csd(self.t)
                     # symbolic method in .ac
-                    elif self.analysis[0].lower() == '.ac':
+                    elif self.analysis[0].lower() == ".ac":
                         Xc = -1.0 / (2 * np.pi * self.f * self.values[id])
                         i[k, ...] = v / (Xc * 1j)
                     # .OP: do nothing --> ic already zero
 
             # inductor
-            elif variable[0] == 'L':
+            elif variable[0] == "L":
                 # get sub-index of 'L'
                 h = sorted(self.isort[1]).index(self.names.index(variable))
                 # index of the related current in the solution
@@ -1211,7 +1360,7 @@ class Network:
                 i[k, ...] = self.x[n, ...]
 
             # voltage generator
-            elif variable[0] == 'V':
+            elif variable[0] == "V":
                 # get sub-index of 'V'
                 h = sorted(self.isort[3]).index(self.names.index(variable))
                 # index of the related current in the solution
@@ -1220,7 +1369,7 @@ class Network:
                 i[k, ...] = self.x[n, ...]
 
             # current generator
-            elif variable[0] == 'I':
+            elif variable[0] == "I":
                 id = self.names.index(variable)
                 if isinstance(self.values[id], list):
                     tsr_fun = getattr(tsr, self.source_type[self.names[id]])
@@ -1229,7 +1378,7 @@ class Network:
                     i[k, ...] = self.values[id]
 
             # VCVS
-            elif variable[0] == 'E':
+            elif variable[0] == "E":
                 # get sub-index of 'E'
                 h = sorted(self.isort[5]).index(self.names.index(variable))
                 # index of the related current in the solution
@@ -1238,22 +1387,32 @@ class Network:
                 i[k, ...] = self.x[n, ...]
 
             # CCCS
-            elif variable[0] == 'F':
+            elif variable[0] == "F":
                 # get Vsens
                 Vsens = self.control_source[variable]
                 # get current
-                i[k, ...] = self.get_current(Vsens) * self.values[self.names.index(variable)]
+                i[k, ...] = (
+                    self.get_current(Vsens) * self.values[self.names.index(variable)]
+                )
 
             # VCCS
-            elif variable[0] == 'G':
-                i[k, ...] = self.values[self.names.index(variable)] * self.get_voltage(self.control_source[variable])
+            elif variable[0] == "G":
+                i[k, ...] = self.values[self.names.index(variable)] * self.get_voltage(
+                    self.control_source[variable]
+                )
 
             # CCVS
-            elif variable[0] == 'H':
+            elif variable[0] == "H":
                 # get sub-index of 'H'
                 h = sorted(self.isort[8]).index(self.names.index(variable))
                 # index of the related current in the solution
-                n = self.node_num + len(self.isort[1]) + len(self.isort[3]) + len(self.isort[5]) + h
+                n = (
+                    self.node_num
+                    + len(self.isort[1])
+                    + len(self.isort[3])
+                    + len(self.isort[5])
+                    + h
+                )
                 # get current
                 i[k, ...] = self.x[n, ...]
 
@@ -1262,7 +1421,6 @@ class Network:
             i = i.flatten()
 
         return i
-
 
     def reorder(self):
         """
@@ -1282,23 +1440,23 @@ class Network:
         ivccs = []
         iccvs = []
         for k, ele in enumerate(self.names):
-            if ele[0].upper() == 'R':
+            if ele[0].upper() == "R":
                 ires.append([int(ele[1:]), k])
-            elif ele[0].upper() == 'L':
+            elif ele[0].upper() == "L":
                 iind.append([int(ele[1:]), k])
-            elif ele[0].upper() == 'C':
+            elif ele[0].upper() == "C":
                 icap.append([int(ele[1:]), k])
-            elif ele[0].upper() == 'V':
+            elif ele[0].upper() == "V":
                 ivolt.append([int(ele[1:]), k])
-            elif ele[0].upper() == 'I':
+            elif ele[0].upper() == "I":
                 icur.append([int(ele[1:]), k])
-            elif ele[0].upper() == 'E':
+            elif ele[0].upper() == "E":
                 ivcvs.append([int(ele[1:]), k])
-            elif ele[0].upper() == 'F':
+            elif ele[0].upper() == "F":
                 icccs.append([int(ele[1:]), k])
-            elif ele[0].upper() == 'G':
+            elif ele[0].upper() == "G":
                 ivccs.append([int(ele[1:]), k])
-            elif ele[0].upper() == 'H':
+            elif ele[0].upper() == "H":
                 iccvs.append([int(ele[1:]), k])
 
         self.isort = []
@@ -1312,24 +1470,23 @@ class Network:
         self.isort.append([k for foo, k in sorted(ivccs)])
         self.isort.append([k for foo, k in sorted(iccvs)])
 
-    def print(self, variable='all', polar=False, message=False):
-
+    def print(self, variable="all", polar=False, message=False):
         # common formatter
-        voltage_fmt = 'v({}) = {:10.4g} V\n'
-        voltage_fmt_polar = 'v({}) = {:10.4g} V < {:10.4g}°\n'
-        current_fmt = 'i({}) = {:10.4g} A\n'
-        current_fmt_polar = 'i({}) = {:10.4g} A < {:10.4g}°\n'
-        power_fmt = 'p({}) = {:10.4g} {}\n'
-        power_fmt_polar = 'p({}) = {:10.4g} {} < {:10.4g}°\n'
-        
+        voltage_fmt = "v({}) = {:10.4g} V\n"
+        voltage_fmt_polar = "v({}) = {:10.4g} V < {:10.4g}°\n"
+        current_fmt = "i({}) = {:10.4g} A\n"
+        current_fmt_polar = "i({}) = {:10.4g} A < {:10.4g}°\n"
+        power_fmt = "p({}) = {:10.4g} {}\n"
+        power_fmt_polar = "p({}) = {:10.4g} {} < {:10.4g}°\n"
+
         # if necessary reorder
         if self.isort is None:
             self.reorder()
 
-        if variable.lower() == 'voltage':
-            msg = '==============================================\n'
-            msg += '             branch voltages\n'
-            msg += '==============================================\n'
+        if variable.lower() == "voltage":
+            msg = "==============================================\n"
+            msg += "             branch voltages\n"
+            msg += "==============================================\n"
 
             # check presence of branch voltages
             if self.vb is None:
@@ -1339,50 +1496,78 @@ class Network:
                 if polar:
                     if k == 0:  # resistors
                         for h in index:
-                            msg += voltage_fmt_polar.format(self.names[h], np.abs(self.vb[h]), np.angle(self.vb[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += voltage_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.vb[h]),
+                                np.angle(self.vb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                     elif k == 1:  # voltage sources
                         for h in index:
-                            msg += voltage_fmt_polar.format(self.names[h], np.abs(self.vb[h]), np.angle(self.vb[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += voltage_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.vb[h]),
+                                np.angle(self.vb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                     elif k == 2:  # voltage sources
                         for h in index:
-                            msg += voltage_fmt_polar.format(self.names[h], np.abs(self.vb[h]), np.angle(self.vb[h], deg=True))
-                            msg += '----------------------------------------------\n'
-                    elif (k == 3) | (k == 5) | (k ==8):  # voltage sources or VCVS or CCVS
+                            msg += voltage_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.vb[h]),
+                                np.angle(self.vb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 3) | (k == 5) | (k == 8)
+                    ):  # voltage sources or VCVS or CCVS
                         for h in index:
-                            msg += voltage_fmt_polar.format(self.names[h], np.abs(self.vb[h]), np.angle(self.vb[h], deg=True))
-                            msg += '----------------------------------------------\n'
-                    elif (k == 4) | (k == 6) | (k == 7):  # current sources or CCCS or VCCS
+                            msg += voltage_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.vb[h]),
+                                np.angle(self.vb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 4) | (k == 6) | (k == 7)
+                    ):  # current sources or CCCS or VCCS
                         for h in index:
-                            msg += voltage_fmt_polar.format(self.names[h], np.abs(self.vb[h]), np.angle(self.vb[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += voltage_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.vb[h]),
+                                np.angle(self.vb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                 else:
                     if k == 0:  # resistors
                         for h in index:
                             msg += voltage_fmt.format(self.names[h], self.vb[h])
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
                     elif k == 1:  # voltage sources
                         for h in index:
                             msg += voltage_fmt.format(self.names[h], self.vb[h])
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
                     elif k == 2:  # voltage sources
                         for h in index:
                             msg += voltage_fmt.format(self.names[h], self.vb[h])
-                            msg += '----------------------------------------------\n'
-                    elif (k == 3) | (k == 5) | (k ==8):  # voltage sources or VCVS or CCVS
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 3) | (k == 5) | (k == 8)
+                    ):  # voltage sources or VCVS or CCVS
                         for h in index:
                             msg += voltage_fmt.format(self.names[h], self.vb[h])
-                            msg += '----------------------------------------------\n'
-                    elif (k == 4) | (k == 6) | (k == 7):  # current sources or CCCS or VCCS
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 4) | (k == 6) | (k == 7)
+                    ):  # current sources or CCCS or VCCS
                         for h in index:
                             msg += voltage_fmt.format(self.names[h], self.vb[h])
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
 
-        elif variable.lower() == 'current':
-            msg = '==============================================\n'
-            msg += '             branch currents\n'
-            msg += '==============================================\n'
+        elif variable.lower() == "current":
+            msg = "==============================================\n"
+            msg += "             branch currents\n"
+            msg += "==============================================\n"
 
             # check presence of branch currents
             if self.ib is None:
@@ -1392,174 +1577,302 @@ class Network:
                 if polar:
                     if k == 0:  # resistors
                         for h in index:
-                            msg += current_fmt_polar.format(self.names[h], np.abs(self.ib[h]), np.angle(self.ib[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += current_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.ib[h]),
+                                np.angle(self.ib[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                     elif k == 1:  # inductors
                         for h in index:
-                            msg += current_fmt_polar.format(self.names[h], np.abs(self.ib[h]), np.angle(self.ib[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += current_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.ib[h]),
+                                np.angle(self.ib[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                     elif k == 2:  # capacitors
                         for h in index:
-                            msg += current_fmt_polar.format(self.names[h], np.abs(self.ib[h]), np.angle(self.ib[h], deg=True))
-                            msg += '----------------------------------------------\n'
-                    elif (k == 3) | (k == 5) | (k ==8):  # voltage sources or VCVS or CCVS
+                            msg += current_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.ib[h]),
+                                np.angle(self.ib[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 3) | (k == 5) | (k == 8)
+                    ):  # voltage sources or VCVS or CCVS
                         for h in index:
-                            msg += current_fmt_polar.format(self.names[h], np.abs(self.ib[h]), np.angle(self.ib[h], deg=True))
-                            msg += '----------------------------------------------\n'
-                    elif (k == 4) | (k == 6) | (k == 7):  # current sources or CCCS or VCCS
+                            msg += current_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.ib[h]),
+                                np.angle(self.ib[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 4) | (k == 6) | (k == 7)
+                    ):  # current sources or CCCS or VCCS
                         for h in index:
-                            msg += current_fmt_polar.format(self.names[h], np.abs(self.ib[h]), np.angle(self.ib[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += current_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.ib[h]),
+                                np.angle(self.ib[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                 else:
                     if k == 0:  # resistors
                         for h in index:
                             msg += current_fmt.format(self.names[h], self.ib[h])
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
                     elif k == 1:  # inductors
                         for h in index:
                             msg += current_fmt.format(self.names[h], self.ib[h])
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
                     elif k == 2:  # capacitors
                         for h in index:
                             msg += current_fmt.format(self.names[h], self.ib[h])
-                            msg += '----------------------------------------------\n'
-                    elif (k == 3) | (k == 5) | (k ==8):  # voltage sources or VCVS or CCVS
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 3) | (k == 5) | (k == 8)
+                    ):  # voltage sources or VCVS or CCVS
                         for h in index:
                             msg += current_fmt.format(self.names[h], self.ib[h])
-                            msg += '----------------------------------------------\n'
-                    elif (k == 4) | (k == 6) | (k == 7):  # current sources or CCCS or VCCS
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 4) | (k == 6) | (k == 7)
+                    ):  # current sources or CCCS or VCCS
                         for h in index:
                             msg += current_fmt.format(self.names[h], self.ib[h])
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
 
-        if variable.lower() == 'power':
-
+        if variable.lower() == "power":
             # check presence of branch powers
             if self.pb is None:
                 self.branch_power()
 
-            if self.analysis[0].lower() == '.op':
-                unitsR = 'W'
-                unitsL = 'W'
-                unitsC = 'W'
-                unitsV = 'W'
-                unitsI = 'W'
-            elif self.analysis[0].lower() == '.ac':
-                unitsR = 'W'
-                unitsL = 'var'
-                unitsC = 'var'
-                unitsV = 'VA'
-                unitsI = 'VA'
-            elif self.analysis[0].lower() == '.tran':
+            if self.analysis[0].lower() == ".op":
+                unitsR = "W"
+                unitsL = "W"
+                unitsC = "W"
+                unitsV = "W"
+                unitsI = "W"
+            elif self.analysis[0].lower() == ".ac":
+                unitsR = "W"
+                unitsL = "var"
+                unitsC = "var"
+                unitsV = "VA"
+                unitsI = "VA"
+            elif self.analysis[0].lower() == ".tran":
                 print("Function not supported for transient")
                 return -1
 
-            msg = '==============================================\n'
-            msg += '             branch powers\n'
-            msg += '==============================================\n'
+            msg = "==============================================\n"
+            msg += "             branch powers\n"
+            msg += "==============================================\n"
 
             for k, index in enumerate(self.isort):
                 if polar:
                     if k == 0:  # resistors
                         for h in index:
-                            msg += power_fmt_polar.format(self.names[h], np.abs(self.pb[h]), unitsR, np.angle(self.pb[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += power_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.pb[h]),
+                                unitsR,
+                                np.angle(self.pb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                     elif k == 1:  # inductors
                         for h in index:
-                            msg += power_fmt_polar.format(self.names[h], np.abs(self.pb[h]), unitsL, np.angle(self.pb[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += power_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.pb[h]),
+                                unitsL,
+                                np.angle(self.pb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                     elif k == 2:  # capacitors
                         for h in index:
-                            msg += power_fmt_polar.format(self.names[h], np.abs(self.pb[h]), unitsC, np.angle(self.pb[h], deg=True))
-                            msg += '----------------------------------------------\n'
-                    elif (k == 3) | (k == 5) | (k ==8):  # voltage sources or VCVS or CCVS
+                            msg += power_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.pb[h]),
+                                unitsC,
+                                np.angle(self.pb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 3) | (k == 5) | (k == 8)
+                    ):  # voltage sources or VCVS or CCVS
                         for h in index:
-                            msg += power_fmt_polar.format(self.names[h], np.abs(self.pb[h]), unitsV, np.angle(self.pb[h], deg=True))
-                            msg += '----------------------------------------------\n'
-                    elif (k == 4) | (k == 6) | (k == 7):  # current sources or CCCS or VCCS
+                            msg += power_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.pb[h]),
+                                unitsV,
+                                np.angle(self.pb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 4) | (k == 6) | (k == 7)
+                    ):  # current sources or CCCS or VCCS
                         for h in index:
-                            msg += power_fmt_polar.format(self.names[h], np.abs(self.pb[h]), unitsI, np.angle(self.pb[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += power_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.pb[h]),
+                                unitsI,
+                                np.angle(self.pb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                 else:
                     if k == 0:  # resistors
                         for h in index:
                             msg += power_fmt.format(self.names[h], self.pb[h], unitsR)
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
                     elif k == 1:  # inductors
                         for h in index:
                             msg += power_fmt.format(self.names[h], self.pb[h], unitsL)
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
                     elif k == 2:  # capacitors
                         for h in index:
                             msg += power_fmt.format(self.names[h], self.pb[h], unitsC)
-                            msg += '----------------------------------------------\n'
-                    elif (k == 3) | (k == 5) | (k ==8):  # voltage sources or VCVS or CCVS
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 3) | (k == 5) | (k == 8)
+                    ):  # voltage sources or VCVS or CCVS
                         for h in index:
                             msg += power_fmt.format(self.names[h], self.pb[h], unitsV)
-                            msg += '----------------------------------------------\n'
-                    elif (k == 4) | (k == 6) | (k == 7):  # current sources or CCCS or VCCS
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 4) | (k == 6) | (k == 7)
+                    ):  # current sources or CCCS or VCCS
                         for h in index:
                             msg += power_fmt.format(self.names[h], self.pb[h], unitsI)
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
 
-        elif variable.lower() == 'all':
-
+        elif variable.lower() == "all":
             # check presence of branch powers
             if self.pb is None:
                 self.branch_power()
 
-            if self.analysis[0].lower() == '.op':
-                unitsR = 'W'
-                unitsL = 'W'
-                unitsC = 'W'
-                unitsV = 'W'
-                unitsI = 'W'
-            elif self.analysis[0].lower() == '.ac':
-                unitsR = 'W'
-                unitsL = 'var'
-                unitsC = 'var'
-                unitsV = 'VA'
-                unitsI = 'VA'
-            elif self.analysis[0].lower() == '.tran':
+            if self.analysis[0].lower() == ".op":
+                unitsR = "W"
+                unitsL = "W"
+                unitsC = "W"
+                unitsV = "W"
+                unitsI = "W"
+            elif self.analysis[0].lower() == ".ac":
+                unitsR = "W"
+                unitsL = "var"
+                unitsC = "var"
+                unitsV = "VA"
+                unitsI = "VA"
+            elif self.analysis[0].lower() == ".tran":
                 print("Function not supported for transient")
                 return -1
 
-            msg = '==============================================\n'
-            msg += '               branch quantities\n'
-            msg += '==============================================\n'
+            msg = "==============================================\n"
+            msg += "               branch quantities\n"
+            msg += "==============================================\n"
 
             for k, index in enumerate(self.isort):
                 if polar:
                     if k == 0:  # resistors
                         for h in index:
-                            msg += voltage_fmt_polar.format(self.names[h], np.abs(self.vb[h]), np.angle(self.vb[h], deg=True))
-                            msg += current_fmt_polar.format(self.names[h], np.abs(self.ib[h]), np.angle(self.ib[h], deg=True))
-                            msg += power_fmt_polar.format(self.names[h], np.abs(self.pb[h]), unitsR , np.angle(self.pb[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += voltage_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.vb[h]),
+                                np.angle(self.vb[h], deg=True),
+                            )
+                            msg += current_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.ib[h]),
+                                np.angle(self.ib[h], deg=True),
+                            )
+                            msg += power_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.pb[h]),
+                                unitsR,
+                                np.angle(self.pb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                     elif k == 1:  # inductors
                         for h in index:
-                            msg += voltage_fmt_polar.format(self.names[h], np.abs(self.vb[h]), np.angle(self.vb[h], deg=True))
-                            msg += current_fmt_polar.format(self.names[h], np.abs(self.ib[h]), np.angle(self.ib[h], deg=True))
-                            msg += power_fmt_polar.format(self.names[h], np.abs(self.pb[h]), unitsL , np.angle(self.pb[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += voltage_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.vb[h]),
+                                np.angle(self.vb[h], deg=True),
+                            )
+                            msg += current_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.ib[h]),
+                                np.angle(self.ib[h], deg=True),
+                            )
+                            msg += power_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.pb[h]),
+                                unitsL,
+                                np.angle(self.pb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
                     elif k == 2:  # capacitors
                         for h in index:
-                            msg += voltage_fmt_polar.format(self.names[h], np.abs(self.vb[h]), np.angle(self.vb[h], deg=True))
-                            msg += current_fmt_polar.format(self.names[h], np.abs(self.ib[h]), np.angle(self.ib[h], deg=True))
-                            msg += power_fmt_polar.format(self.names[h], np.abs(self.pb[h]), unitsC , np.angle(self.pb[h], deg=True))
-                            msg += '----------------------------------------------\n'
-                    elif (k == 3) | (k == 5) | (k ==8):  # voltage sources or VCVS or CCVS
+                            msg += voltage_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.vb[h]),
+                                np.angle(self.vb[h], deg=True),
+                            )
+                            msg += current_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.ib[h]),
+                                np.angle(self.ib[h], deg=True),
+                            )
+                            msg += power_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.pb[h]),
+                                unitsC,
+                                np.angle(self.pb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 3) | (k == 5) | (k == 8)
+                    ):  # voltage sources or VCVS or CCVS
                         for h in index:
-                            msg += voltage_fmt_polar.format(self.names[h], np.abs(self.vb[h]), np.angle(self.vb[h], deg=True))
-                            msg += current_fmt_polar.format(self.names[h], np.abs(self.ib[h]), np.angle(self.ib[h], deg=True))
-                            msg += power_fmt_polar.format(self.names[h], np.abs(self.pb[h]), unitsV, np.angle(self.pb[h], deg=True))
-                            msg += '----------------------------------------------\n'
-                    elif (k == 4) | (k == 6) | (k == 7):  # current sources or CCCS or VCCS
+                            msg += voltage_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.vb[h]),
+                                np.angle(self.vb[h], deg=True),
+                            )
+                            msg += current_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.ib[h]),
+                                np.angle(self.ib[h], deg=True),
+                            )
+                            msg += power_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.pb[h]),
+                                unitsV,
+                                np.angle(self.pb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 4) | (k == 6) | (k == 7)
+                    ):  # current sources or CCCS or VCCS
                         for h in index:
-                            msg += voltage_fmt_polar.format(self.names[h], np.abs(self.vb[h]), np.angle(self.vb[h], deg=True))
-                            msg += current_fmt_polar.format(self.names[h], np.abs(self.ib[h]), np.angle(self.ib[h], deg=True))
-                            msg += power_fmt_polar.format(self.names[h], np.abs(self.pb[h]), unitsI, np.angle(self.pb[h], deg=True))
-                            msg += '----------------------------------------------\n'
+                            msg += voltage_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.vb[h]),
+                                np.angle(self.vb[h], deg=True),
+                            )
+                            msg += current_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.ib[h]),
+                                np.angle(self.ib[h], deg=True),
+                            )
+                            msg += power_fmt_polar.format(
+                                self.names[h],
+                                np.abs(self.pb[h]),
+                                unitsI,
+                                np.angle(self.pb[h], deg=True),
+                            )
+                            msg += "----------------------------------------------\n"
 
                 else:
                     if k == 0:  # resistors
@@ -1567,31 +1880,35 @@ class Network:
                             msg += voltage_fmt.format(self.names[h], self.vb[h])
                             msg += current_fmt.format(self.names[h], self.ib[h])
                             msg += power_fmt.format(self.names[h], self.pb[h], unitsR)
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
                     elif k == 1:  # inductors
                         for h in index:
                             msg += voltage_fmt.format(self.names[h], self.vb[h])
                             msg += current_fmt.format(self.names[h], self.ib[h])
                             msg += power_fmt.format(self.names[h], self.pb[h], unitsL)
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
                     elif k == 2:  # capacitors
                         for h in index:
                             msg += voltage_fmt.format(self.names[h], self.vb[h])
                             msg += current_fmt.format(self.names[h], self.ib[h])
                             msg += power_fmt.format(self.names[h], self.pb[h], unitsC)
-                            msg += '----------------------------------------------\n'
-                    elif (k == 3) | (k == 5) | (k ==8):  # voltage sources or VCVS or CCVS
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 3) | (k == 5) | (k == 8)
+                    ):  # voltage sources or VCVS or CCVS
                         for h in index:
                             msg += voltage_fmt.format(self.names[h], self.vb[h])
                             msg += current_fmt.format(self.names[h], self.ib[h])
                             msg += power_fmt.format(self.names[h], self.pb[h], unitsV)
-                            msg += '----------------------------------------------\n'
-                    elif (k == 4) | (k == 6) | (k == 7):  # current sources or CCCS or VCCS
+                            msg += "----------------------------------------------\n"
+                    elif (
+                        (k == 4) | (k == 6) | (k == 7)
+                    ):  # current sources or CCCS or VCCS
                         for h in index:
                             msg += voltage_fmt.format(self.names[h], self.vb[h])
                             msg += current_fmt.format(self.names[h], self.ib[h])
                             msg += power_fmt.format(self.names[h], self.pb[h], unitsI)
-                            msg += '----------------------------------------------\n'
+                            msg += "----------------------------------------------\n"
 
         if message:
             return msg
@@ -1600,9 +1917,8 @@ class Network:
             return None
 
     def plot(self, to_file=False, filename=None, dpi_value=150):
-
         # check if the analysis is '.tran'
-        if self.analysis[0].lower() != '.tran':
+        if self.analysis[0].lower() != ".tran":
             print("plot not supported of analysis: '{}".format(self.analysis[0]))
             return -1
         else:
@@ -1616,17 +1932,21 @@ class Network:
             plot_cmd = self.plot_cmd.upper()
 
             # check at least one voltage/current has to be plotted
-            plotV = plot_cmd.find('V(')
-            plotI = plot_cmd.find('I(')
+            plotV = plot_cmd.find("V(")
+            plotI = plot_cmd.find("I(")
             if (plotV == -1) and (plotI == -1):
-                print("no variables has been provided in this command: {}".format(plot_cmd))
+                print(
+                    "no variables has been provided in this command: {}".format(
+                        plot_cmd
+                    )
+                )
                 return -1
             elif (plotV != -1) and (plotI == -1):
                 makesubplot = False
-                Ylbl = 'voltage (V)'
+                Ylbl = "voltage (V)"
             elif (plotV == -1) and (plotI != -1):
                 makesubplot = False
-                Ylbl = 'current (A)'
+                Ylbl = "current (A)"
             elif (plotV != -1) and (plotI != -1):
                 makesubplot = True
 
@@ -1642,11 +1962,11 @@ class Network:
 
             # cycle on variables
             for k, variable in enumerate(plot_list):
-                if variable[0] == 'V':
-                    remove_char = ('V(',')')
+                if variable[0] == "V":
+                    remove_char = ("V(", ")")
 
                     for char in remove_char:
-                        variable = variable.replace(char, '')
+                        variable = variable.replace(char, "")
 
                     v = self.get_voltage(variable)
 
@@ -1654,12 +1974,11 @@ class Network:
                         plt.sca(axs[0])
                     plt.plot(self.t, v, label=legend_entries[k])
 
-
-                elif variable[0] == 'I':
-                    remove_char = ('I(', ')')
+                elif variable[0] == "I":
+                    remove_char = ("I(", ")")
 
                     for char in remove_char:
-                        variable = variable.replace(char, '')
+                        variable = variable.replace(char, "")
 
                     i = self.get_current(variable)
 
@@ -1667,23 +1986,21 @@ class Network:
                         plt.sca(axs[1])
                     plt.plot(self.t, i, label=legend_entries[k])
 
-
-
             if makesubplot:
                 plt.sca(axs[0])
-                plt.ylabel('voltage (V)', fontsize=16)
+                plt.ylabel("voltage (V)", fontsize=16)
                 plt.grid()
                 plt.legend()
                 plt.tight_layout()
 
                 plt.sca(axs[1])
-                plt.xlabel('time (s)', fontsize=16)
-                plt.ylabel('current (A)', fontsize=16)
+                plt.xlabel("time (s)", fontsize=16)
+                plt.ylabel("current (A)", fontsize=16)
                 plt.grid()
                 plt.legend()
                 plt.tight_layout()
             else:
-                plt.xlabel('time (s)', fontsize=16)
+                plt.xlabel("time (s)", fontsize=16)
                 plt.ylabel(Ylbl, fontsize=16)
                 plt.grid()
                 plt.legend()
@@ -1691,7 +2008,7 @@ class Network:
 
             if to_file:
                 if filename is None:
-                    filename='transient_plot.png'
+                    filename = "transient_plot.png"
 
                 hf.savefig(filename, dpi=dpi_value)
 
@@ -1711,48 +2028,51 @@ class Network:
         """
 
         # check if the analysis is '.ac'
-        if self.analysis[0].lower() != '.ac':
+        if self.analysis[0].lower() != ".ac":
             raise ValueError("bode() method available only for .ac analyses")
         # check if is a multi-freq analysis
         if np.isscalar(self.f):
-            raise ValueError("bode() method useful for multi-frequency analyses. Use print() for single-frequency.")
+            raise ValueError(
+                "bode() method useful for multi-frequency analyses. Use print() for single-frequency."
+            )
 
         # convert the N tf in a Nx2 array
-        tf_array = np.array(self.tf_cmd.upper().split()[1:]).reshape(-1,2)
+        tf_array = np.array(self.tf_cmd.upper().split()[1:]).reshape(-1, 2)
 
         # compute tf
         hf = []
         for tf in tf_array:
             # output variable
-            if 'V(' in tf[0]:
-                out = self.get_voltage(tf[0].replace('V(','').replace(')',''))
-            elif 'I(' in tf[0]:
-                out = self.get_current(tf[0].replace('I(', '').replace(')', ''))
+            if "V(" in tf[0]:
+                out = self.get_voltage(tf[0].replace("V(", "").replace(")", ""))
+            elif "I(" in tf[0]:
+                out = self.get_current(tf[0].replace("I(", "").replace(")", ""))
             # input variable
-            if 'V(' in tf[1]:
-                input = self.get_voltage(tf[1].replace('V(','').replace(')',''))
-            elif 'I(' in tf[1]:
-                input = self.get_current(tf[1].replace('I(', '').replace(')', ''))
+            if "V(" in tf[1]:
+                input = self.get_voltage(tf[1].replace("V(", "").replace(")", ""))
+            elif "I(" in tf[1]:
+                input = self.get_current(tf[1].replace("I(", "").replace(")", ""))
             # tf
             H = out / input
 
             # plot
             import matplotlib.pyplot as plt
+
             fig, axs = plt.subplots(2, 1)
             plt.sca(axs[0])
-            plt.title('tf: ' + tf[0] + '/' + tf[1], fontsize=14)
+            plt.title("tf: " + tf[0] + "/" + tf[1], fontsize=14)
             if decibel:
                 plt.semilogx(self.f, 20 * np.log10(np.abs(H)))
-                plt.ylabel('magnitude (dB)', fontsize=14)
+                plt.ylabel("magnitude (dB)", fontsize=14)
             else:
                 plt.semilogx(self.f, np.abs(H))
-                plt.ylabel('magnitude', fontsize=14)
+                plt.ylabel("magnitude", fontsize=14)
             plt.grid()
 
             plt.sca(axs[1])
             plt.semilogx(self.f, np.angle(H) * 180 / np.pi)
-            plt.xlabel('frequency (Hz)', fontsize=14)
-            plt.ylabel('phase (deg)', fontsize=14)
+            plt.xlabel("frequency (Hz)", fontsize=14)
+            plt.ylabel("phase (deg)", fontsize=14)
             plt.grid()
             plt.tight_layout()
 
@@ -1761,10 +2081,10 @@ class Network:
         # save to file
         if to_file:
             if filename is None:
-                filename = 'bode_plot.png'
+                filename = "bode_plot.png"
             else:
-                if filename[-4:].lower() != '.png':
-                    filename += '.png'
+                if filename[-4:].lower() != ".png":
+                    filename += ".png"
 
             if len(hf) == 0:
                 pass
@@ -1773,7 +2093,9 @@ class Network:
                 hf.savefig(filename, dpi=dpi_value)
             else:
                 for k, fig in enumerate(hf):
-                    fig.savefig(filename.replace('.png', '_' + str(k) + '.png'), dpi=dpi_value)
+                    fig.savefig(
+                        filename.replace(".png", "_" + str(k) + ".png"), dpi=dpi_value
+                    )
         else:
             if len(hf) == 1:
                 hf = hf[0]

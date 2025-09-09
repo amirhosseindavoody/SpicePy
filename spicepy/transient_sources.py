@@ -30,7 +30,7 @@ def pwl(pairs, t):
 
     # check pairs format
     if pairs.ndim == 1:
-        pairs.shape = (-1,2)
+        pairs.shape = (-1, 2)
 
     # get pairs
     x = []
@@ -40,7 +40,9 @@ def pwl(pairs, t):
         y.append(yk)
 
     # create linear interpolator
-    fun = interp1d(x, y, bounds_error=False, fill_value=(y[0], y[-1]), assume_sorted=True)
+    fun = interp1d(
+        x, y, bounds_error=False, fill_value=(y[0], y[-1]), assume_sorted=True
+    )
     # interpolation
     out = fun(t)
 
@@ -69,7 +71,7 @@ def pulse(V1, V2, Td=0, Tr=None, Tf=None, Pw=None, Period=None, t=None):
 
     # check presence of time input
     if t is None:
-        raise TypeError('Missing time input')
+        raise TypeError("Missing time input")
 
     # check if t is scalar
     if isinstance(t, (int, float)):
@@ -78,9 +80,8 @@ def pulse(V1, V2, Td=0, Tr=None, Tf=None, Pw=None, Period=None, t=None):
 
         # check presence of Tr, and Tf (raise error)
         if (Tr == None) or (Tf == None):
-            raise TypeError('Missing Tr and/or Tf')
+            raise TypeError("Missing Tr and/or Tf")
     else:
-
         # check presence of Tr, and Tf (assign default)
         time_step = t[1] - t[0]
         if Tr == None:
@@ -90,7 +91,6 @@ def pulse(V1, V2, Td=0, Tr=None, Tf=None, Pw=None, Period=None, t=None):
 
     # check presence of Pw and Period fot t > Td
     if t[-1] > Td:
-
         if Pw == None:
             Pw = t[-1] - Td
 
@@ -99,7 +99,6 @@ def pulse(V1, V2, Td=0, Tr=None, Tf=None, Pw=None, Period=None, t=None):
 
     # get number of finite periods
     N = np.ceil((t[-1] - Td) / Period) + 1
-
 
     # initialize pairs (with or without delay)
     if Td != 0:
@@ -124,9 +123,10 @@ def pulse(V1, V2, Td=0, Tr=None, Tf=None, Pw=None, Period=None, t=None):
         y.append(V1)
         time = time + Period
 
-
     # create linear interpolator
-    fun = interp1d(x, y,bounds_error=False, fill_value=(y[0], y[-1]), assume_sorted=True)
+    fun = interp1d(
+        x, y, bounds_error=False, fill_value=(y[0], y[-1]), assume_sorted=True
+    )
     # interpolation
     out = fun(t)
 
@@ -158,7 +158,7 @@ def sin(Vo, Va, Freq=None, Td=0, Df=0, Phase=0, t=None):
 
     # check presence of time array
     if t is None:
-        raise TypeError('Missing time array')
+        raise TypeError("Missing time array")
 
     # check if t is scalar
     if isinstance(t, (int, float)):
@@ -170,7 +170,9 @@ def sin(Vo, Va, Freq=None, Td=0, Df=0, Phase=0, t=None):
 
     out = np.zeros_like(t)
     out[t <= Td] = Vo + Va * np.sin(Phase * (np.pi / 180))
-    out[t > Td] = Vo + Va * np.sin(2 * np.pi * Freq * (t[t > Td] - Td) + Phase * (np.pi / 180)) * np.exp(-(t[t > Td] - Td) * Df)
+    out[t > Td] = Vo + Va * np.sin(
+        2 * np.pi * Freq * (t[t > Td] - Td) + Phase * (np.pi / 180)
+    ) * np.exp(-(t[t > Td] - Td) * Df)
 
     # if input is scalar convert out to scalar too
     if out.size == 1:
@@ -200,16 +202,15 @@ def exp(V1, V2, Td1=0, tau1=None, Td2=None, tau2=None, t=None):
 
     # check presence of time array
     if t is None:
-        raise TypeError('Missing time array')
+        raise TypeError("Missing time array")
 
     if isinstance(t, (int, float)):
         t = np.array([t])
 
         # check presence of T1, Td2 and T2
         if (tau1 is None) or (Td2 is None) or (tau2 is None):
-            raise TypeError('Missing tau1 and/or Td2 and/or tau2')
+            raise TypeError("Missing tau1 and/or Td2 and/or tau2")
     else:
-
         # check presence of T1, Td2 and T2
         time_step = t[1] - t[0]
         if tau1 is None:
@@ -219,7 +220,6 @@ def exp(V1, V2, Td1=0, tau1=None, Td2=None, tau2=None, t=None):
         if tau2 is None:
             tau2 = np.copy(time_step)
 
-
     out = np.zeros_like(t)
 
     out[t <= Td1] = V1
@@ -228,7 +228,7 @@ def exp(V1, V2, Td1=0, tau1=None, Td2=None, tau2=None, t=None):
     out[id] = V1 + (V2 - V1) * (1 - np.exp(-(t[id] - t[id][0]) / tau1))
 
     Vend = out[id][-1]
-    id = (t > Td2)
+    id = t > Td2
     out[id] = V1 + (Vend - V1) * np.exp(-(t[id] - t[id][0]) / tau2)
 
     # if input is scalar convert out to scalar too

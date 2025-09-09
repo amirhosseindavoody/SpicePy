@@ -3,7 +3,7 @@ import spicepy.netlist as ntl
 from spicepy.netsolve import net_solve
 
 # read netlist
-net = ntl.Network('VCVS_and_CCCS.net')
+net = ntl.Network("VCVS_and_CCCS.net")
 
 # compute the circuit solution
 net_solve(net)
